@@ -1,6 +1,7 @@
 using System.Data.Common;
 using FirebaseAdmin.Auth;
 using Microsoft.EntityFrameworkCore;
+using PusherServer;
 using resevation_be.DTOs;
 using resevation_be.models;
 
@@ -54,6 +55,22 @@ namespace resevation_be.Services
                     ReservationDate = reservation.Date
                 });
                 Db.SaveChanges();
+                var options = new PusherOptions
+                {
+                    Cluster = "eu",
+                    Encrypted = true
+                };
+
+                var pusher = new Pusher(
+                  "1745003",
+                  "39eebe5a77c510fba350",
+                  "25b16c57fc79871f6539",
+                  options);
+
+                var result = await pusher.TriggerAsync(
+                  uid,
+                  "reservationAdded",
+                  new { message = "reservation was added successfully!" });
                 return true;
             }
             catch (Exception ex)
